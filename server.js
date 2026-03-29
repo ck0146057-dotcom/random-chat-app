@@ -10,12 +10,8 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// ✅ ENV VARIABLES
+// ✅ PORT (IMPORTANT FOR RENDER)
 const PORT = process.env.PORT || 3000;
-
-server.listen(PORT, () => {
-    console.log("Server running on port " + PORT);
-});
 
 // 🔐 Online users
 const onlineUsers = {};
@@ -27,7 +23,7 @@ const rooms = {};
 app.use(express.json());
 app.use(express.static("public"));
 
-// ✅ DATABASE (DEPLOY READY)
+// ✅ DATABASE (Railway)
 const db = mysql.createConnection(process.env.MYSQL_URL);
 
 db.connect((err) => {
@@ -215,7 +211,7 @@ io.on("connection", (socket) => {
         }
     });
 
-    // DISCONNECT (FIXED SINGLE HANDLER)
+    // DISCONNECT
     socket.on("disconnect", () => {
 
         if (socket.partner) {
@@ -232,7 +228,7 @@ io.on("connection", (socket) => {
     });
 });
 
-// START SERVER
+// ✅ ONLY ONE LISTEN (FIXED)
 server.listen(PORT, () => {
     console.log("Server running on port " + PORT);
 });
