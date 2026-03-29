@@ -1,0 +1,73 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: white;
+    text-align: center;
+}
+
+.profile {
+    background: rgba(255,255,255,0.2);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+.home-container {
+    padding: 50px;
+}
+
+.options {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.card {
+    width: 250px;
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    background: rgba(255,255,255,0.1);
+}
+
+.top-bar {
+    position: fixed;   /* 🔥 THIS makes it stay at top */
+    top: 0;
+    left: 0;
+    width: 100%;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 15px 20px;
+    background: rgba(0,0,0,0.3);
+    color: white;
+    z-index: 1000;
+}
+
+.logout-btn {
+    background: red;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    background: darkred;
+}
+
+/* push your content down so it doesn't hide under bar */
+.home-container {
+    margin-top: 80px;
+}

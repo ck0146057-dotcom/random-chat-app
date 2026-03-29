@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <link rel="stylesheet" href="home.css">
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+    <div>👋 Welcome, <span id="userTop"></span></div>
+
+    <div style="display:flex; align-items:center; gap:15px;">
+        <div class="profile">
+            👤 <span id="profileName"></span>
+        </div>
+        <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+</div>
+
+<div class="home-container">
+
+    <h1>🚀 Welcome to ChatSphere 💬</h1>
+    <p id="username"></p>
+
+    <div class="options">
+
+        <div class="card" onclick="goStrangerChat()">
+            <h2>💬 Chat with Strangers</h2>
+            <p>🌍 Talk to random people instantly</p>
+        </div>
+
+        <div class="card" onclick="goGroupChat()">
+            <h2>👥 Group Meeting</h2>
+            <p>🔐 Join secure group conversations</p>
+        </div>
+
+        <div class="card" onclick="goFriends()">
+            <h2>👤 Chat with Friends</h2>
+            <p>❤️ Connect with your friends</p>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+const username = localStorage.getItem("username");
+
+// 🔒 PROTECT PAGE
+if (!username) {
+    window.location.href = "/login.html";
+}
+
+document.getElementById("profileName").innerText = username;
+
+// 👤 SHOW USERNAME
+document.getElementById("username").innerText = "👋 Hello, " + username;
+document.getElementById("userTop").innerText = username;
+
+// NAVIGATION
+function goStrangerChat() {
+    window.location.href = "/chat.html";
+}
+
+function goGroupChat() {
+    window.location.href = "/group.html";
+}
+
+function goFriends() {
+    window.location.href = "/friends.html";
+}
+
+// 🔐 LOGOUT
+function logout() {
+    const confirmLogout = confirm("Are you sure you want to logout?");
+    if (!confirmLogout) return;
+
+    localStorage.removeItem("username");
+    window.location.href = "/login.html";
+}
+</script>
+
+</body>
+</html>

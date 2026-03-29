@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Friends Chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <div>💬 Chat with <span id="friendName"></span></div>
+        <button onclick="goBack()">⬅ Back</button>
+    </div>
+
+    <!-- CHAT AREA -->
+    <div id="chat-box" class="chat-box"></div>
+
+    <!-- INPUT -->
+    <div class="input-area">
+        <input id="msg" placeholder="Type message..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+// 🔐 GET USER + FRIEND
+const username = localStorage.getItem("username");
+const friend = localStorage.getItem("chatFriend");
+
+// 🔒 PROTECT PAGE
+if (!username || !friend) {
+    window.location.href = "/home.html";
+}
+
+// SHOW FRIEND NAME (default offline)
+const friendNameEl = document.getElementById("friendName");
+friendNameEl.innerText = friend + " 🔴";
+
+// SOCKET
+const socket = io();
+
+// ✅ REGISTER USER
+socket.emit("register-user", username);
+
+// ELEMENTS
+const chatBox = document.getElementById("chat-box");
+
+// SEND MESSAGE
+function sendMessage() {
+    const input = document.getElementById("msg");
+    const msg = input.value;
+
+    if (!msg.trim()) return;
+
+    addMessage("me", msg);
+
+    socket.emit("private-message", {
+        to: friend,
+        message: msg
+    });
+
+    input.value = "";
+}
+
+// RECEIVE MESSAGE
+socket.on("private-message", (data) => {
+    if (data.from === friend) {
+        addMessage("friend", data.message);
+    }
+});
+
+// 🟢 ONLINE / 🔴 OFFLINE STATUS
+socket.on("online-users", (users) => {
+    if (users.includes(friend)) {
+        friendNameEl.innerText = friend + " 🟢";
+    } else {
+        friendNameEl.innerText = friend + " 🔴";
+    }
+});
+
+// ADD MESSAGE TO UI
+function addMessage(type, text) {
+    const div = document.createElement("div");
+    div.className = "message " + (type === "me" ? "me" : "stranger");
+
+    const time = new Date().toLocaleTimeString();
+
+    div.innerHTML = `
+        <div>${type === "me" ? "You" : friend}: ${text}</div>
+        <small style="opacity:0.6;">${time}</small>
+    `;
+
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// BACK BUTTON
+function goBack() {
+    window.location.href = "/friends.html";
+}
+
+// ENTER KEY SUPPORT
+document.getElementById("msg").addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+});
+</script>
+
+</body>
+</html>
