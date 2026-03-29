@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    
+<div class="chat-area">
+
+    <div class="top-bar">
+    <div id="status">
+        🟡 Waiting... (You: <span id="user"></span>)
+    </div>
+
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+    <div id="chat-box" class="chat-box"></div>
+
+    <div class="input-area">
+        <input id="msg" placeholder="Type message..." />
+        <button onclick="sendMessage()">Send</button>
+        <button onclick="nextUser()">Next</button>
+    </div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Secure Group Chat</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .room-box {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .room-box input {
+            padding: 10px;
+            margin: 10px;
+            width: 250px;
+        }
+
+        .room-box button {
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <div>👥 Group Chat (<span id="roomName">Not Joined</span>)</div>
+        <button onclick="goHome()">Home</button>
+    </div>
+
+    <!-- ROOM JOIN / CREATE -->
+    <div id="roomSection" class="room-box">
+        <h2>Create / Join Room</h2>
+
+        <input id="roomInput" placeholder="Room Name"><br>
+        <input id="passInput" type="password" placeholder="Password"><br>
+
+        <button onclick="createRoom()">Create Room</button>
+        <button onclick="joinRoom()">Join Room</button>
+    </div>
+
+    <!-- CHAT AREA -->
+    <div id="chatSection" class="hidden">
+        <div id="chat-box" class="chat-box"></div>
+
+        <div class="input-area">
+            <input id="msg" placeholder="Type message..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+const username = localStorage.getItem("username");
+
+if (!username) {
+    window.location.href = "/login.html";
+}
+
+const socket = io();
+
+const chatBox = document.getElementById("chat-box");
+
+let currentRoom = null;
+
+// CREATE ROOM
+function createRoom() {
+    const room = document.getElementById("roomInput").value;
+    const password = document.getElementById("passInput").value;
+
+    if (!room || !password) {
+        alert("Enter room and password");
+        return;
+    }
+
+    socket.emit("create-room", { room, password });
+    currentRoom = room;
+}
+
+// JOIN ROOM
+function joinRoom() {
+    const room = document.getElementById("roomInput").value;
+    const password = document.getElementById("passInput").value;
+
+    if (!room || !password) {
+        alert("Enter room and password");
+        return;
+    }
+
+    socket.emit("join-room", { room, password });
+    currentRoom = room;
+}
+
+// SUCCESS JOIN
+socket.on("system", (msg) => {
+    addSystem(msg);
+
+    if (msg.includes("Joined") || msg.includes("created")) {
+        document.getElementById("roomSection").classList.add("hidden");
+        document.getElementById("chatSection").classList.remove("hidden");
+        document.getElementById("roomName").innerText = currentRoom;
+    }
+});
+
+// ERROR HANDLING
+socket.on("error-msg", (msg) => {
+    alert(msg);
+});
+
+// RECEIVE MESSAGE
+socket.on("group-message", (msg) => {
+    addMessage(msg);
+});
+
+// SEND MESSAGE
+function sendMessage() {
+    const input = document.getElementById("msg");
+    const msg = input.value;
+
+    if (!msg.trim()) return;
+
+    const fullMsg = username + ": " + msg;
+
+    socket.emit("group-message", fullMsg);
+
+    input.value = "";
+}
+
+// ADD MESSAGE
+function addMessage(text) {
+    const div = document.createElement("div");
+    div.className = "message";
+
+    const time = new Date().toLocaleTimeString();
+
+    div.innerHTML = `
+        <div>${text}</div>
+        <small style="opacity:0.6;">${time}</small>
+    `;
+
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// SYSTEM MESSAGE
+function addSystem(text) {
+    const div = document.createElement("div");
+    div.style.color = "yellow";
+    div.innerText = text;
+
+    chatBox.appendChild(div);
+}
+
+// GO HOME
+function goHome() {
+    window.location.href = "/home.html";
+}
+</script>
+
+</body>
+</html>

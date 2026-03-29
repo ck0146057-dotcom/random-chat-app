@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Friends</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div style="padding:20px;">
+
+    <h2>👤 Friends System</h2>
+
+    <!-- SEND REQUEST -->
+    <input id="friendUser" placeholder="Enter username">
+    <button onclick="sendRequest()">Send Request</button>
+
+    <h3>📥 Requests</h3>
+    <div id="requests"></div>
+
+    <h3>✅ Friends</h3>
+    <div id="friends"></div>
+
+</div>
+
+<script>
+const username = localStorage.getItem("username");
+
+if (!username) {
+    window.location.href = "/login.html";
+}
+
+// SEND REQUEST
+function sendRequest() {
+    const to = document.getElementById("friendUser").value;
+
+    fetch("/send-request", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ from: username, to })
+    })
+    .then(res => res.text())
+    .then(alert);
+}
+
+// LOAD REQUESTS
+function loadRequests() {
+    fetch("/requests/" + username)
+    .then(res => res.json())
+    .then(data => {
+        const div = document.getElementById("requests");
+        div.innerHTML = "";
+
+        data.forEach(req => {
+            div.innerHTML += `
+                <p>
+                    ${req.sender}
+                    <button onclick="accept(${req.id})">Accept</button>
+                </p>
+            `;
+        });
+    });
+}
+
+// ACCEPT REQUEST
+function accept(id) {
+    fetch("/accept-request", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ id })
+    })
+    .then(() => {
+        loadRequests();
+        loadFriends();
+    });
+}
+
+// LOAD FRIENDS
+function loadFriends() {
+    fetch("/friends/" + username)
+    .then(res => res.json())
+    .then(data => {
+        const div = document.getElementById("friends");
+        div.innerHTML = "";
+
+        data.forEach(f => {
+            const friend = f.sender === username ? f.receiver : f.sender;
+
+            div.innerHTML += `
+                <p onclick="openChat('${friend}')" style="cursor:pointer; font-weight:bold;">
+                    💬 ${friend}
+                </p>
+            `;
+        });
+    });
+}
+
+// 🔥 IMPORTANT FUNCTION (YOU WERE MISSING THIS OR BROKE IT)
+function openChat(friend) {
+    localStorage.setItem("chatFriend", friend);
+    window.location.href = "/friends-chat.html";
+}
+
+// INITIAL LOAD
+loadRequests();
+loadFriends();
+</script>
+
+</body>
+</html>

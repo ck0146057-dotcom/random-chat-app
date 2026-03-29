@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ChatSphere</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(135deg, #5b6df9, #7d3cff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+
+            position: relative;
+            overflow: hidden;
+        }
+        body::before {
+            content: "💬 👥 ❤️ 🚀 🌍 💬 👥 ❤️ 🚀 🌍 💬 👥 ❤️ 🚀 🌍";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+
+            font-size: 50px;
+            line-height: 90px;
+
+            opacity: 0.08;  /* 🔥 keep this LOW */
+            transform: rotate(-25deg);
+
+            pointer-events: none;
+        }
+
+        .card {
+            position: relative;
+            z-index: 2;   /* 🔥 ensures it stays above emojis */
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #5b6df9;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .link {
+            margin-top: 10px;
+            color: blue;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+
+    <!-- LOGIN -->
+    <div id="loginBox">
+        <h2>Login</h2>
+
+        <input id="loginUser" placeholder="Username">
+        <input id="loginPass" type="password" placeholder="Password">
+
+        <button onclick="login()">Login</button>
+
+        <div class="link" onclick="showSignup()">New user? Signup</div>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="signupBox" class="hidden">
+        <h2>Signup</h2>
+
+        <input id="signupUser" placeholder="Username">
+        <input id="signupPass" type="password" placeholder="Password">
+
+        <button onclick="signup()">Signup</button>
+
+        <div class="link" onclick="showLogin()">Back to Login</div>
+    </div>
+
+</div>
+
+<script>
+function showSignup() {
+    loginBox.classList.add("hidden");
+    signupBox.classList.remove("hidden");
+}
+
+function showLogin() {
+    signupBox.classList.add("hidden");
+    loginBox.classList.remove("hidden");
+}
+
+function signup() {
+    const username = signupUser.value;
+    const password = signupPass.value;
+
+    fetch("/signup", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ username, password })
+    })
+    .then(res => res.text())
+    .then(data => {
+        alert(data);
+        if (data === "Signup successful") {
+            showLogin();
+        }
+    });
+}
+
+function login() {
+    const username = loginUser.value;
+    const password = loginPass.value;
+
+    fetch("/login", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ username, password })
+    })
+    .then(res => res.text())
+    .then(data => {
+        if (data === "Login success") {
+            localStorage.setItem("username", username);
+            window.location.href = "/home.html";
+        } else {
+            alert(data);
+        }
+    });
+}
+</script>
+
+</body>
+</html>
